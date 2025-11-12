@@ -4,40 +4,40 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'site/**'          # only trigger when files in /site/ change
+      - '.github/workflows/deploy.yml'  # or when this workflow itself changes
 
 jobs:
   deploy:
+    name: Build & Deploy to AWS + Cloudflare
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout your repository
+      # Step 1: Checkout code
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Configure AWS credentials
-      - name: Configure AWS
+      # Step 2: Configure AWS credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1  # change if your bucket is in a different region
+          aws-region: us-east-1
 
-      # 3️⃣ List repo files for debugging
-      - name: List repo files
-        run: ls -R
+      # Step 3: Sync static site to S3
+      - name: Sync static site to S3
+        run: |
+          aws s3 sync ./site s3://marlonvaldes.cc --delete
 
-      # 4️⃣ Sync website folder to S3
-      - name: Sync Website to S3
-        run: aws s3 sync ./site s3://marlonvaldes.cc --delete
-
-      # 5️⃣ Purge Cloudflare cache
-      - name: Purge Cloudflare Cache
-        uses: cloudflare/wrangler-action@2.0.0
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: "custom"
-          args: |
-            curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
-              -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-              -H "Content-Type: application/json" \
-              --data '{"purge_everything":true}'
+      # Step 4: Purge Cloudflare cache
+      - name: Purge Cloudflare cache
+        run: |
+          echo "Purging Cloudflare cache..."
+          RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}')
+          echo "Cloudflare API response:"
+          echo "$RESPONSE"
