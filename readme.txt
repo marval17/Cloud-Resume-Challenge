@@ -1,8 +1,8 @@
 🧱 Current Architecture (Serverless + Managed)
 
-Right now, your stack is entirely serverless and declarative via Terraform:
+Stack is entirely serverless and declarative via Terraform:
 
-Frontend: S3 static website
+Frontend: S3 static website (HTML + JS + CSS)
 
 Global delivery: CloudFront (pending AWS approval) + Cloudflare DNS
 
