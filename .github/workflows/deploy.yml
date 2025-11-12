@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repo
+      # 1️⃣ Checkout your repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -20,13 +20,13 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1   # Change if your bucket is in another region
+          aws-region: us-east-1  # change if your bucket is in a different region
 
-      # 3️⃣ List files (debugging)
+      # 3️⃣ List repo files for debugging
       - name: List repo files
         run: ls -R
 
-      # 4️⃣ Sync website to S3
+      # 4️⃣ Sync website folder to S3
       - name: Sync Website to S3
         run: aws s3 sync ./site s3://marlonvaldes.cc --delete
 
@@ -35,5 +35,9 @@ jobs:
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: "zone purge"
-          zone: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          command: "custom"
+          args: |
+            curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+              -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+              -H "Content-Type: application/json" \
+              --data '{"purge_everything":true}'
