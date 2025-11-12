@@ -630,12 +630,43 @@
         </div> <!-- end ss-go-top -->
     </footer>
 
+<!-- Visitor Counter Script -->
+<script>
+async function updateVisitorCount() {
+  const incrementUrl = "https://vxx62vozoe.execute-api.us-east-2.amazonaws.com/count";
+  const viewUrl = "https://vxx62vozoe.execute-api.us-east-2.amazonaws.com/view";
+  const visitorKey = "mvaldes_visited_date";
 
-    <!-- Java Script
-    ================================================== -->
-    <script src="js/plugins.js"></script>
-    <script src="js/main.js"></script>
+  // Get the date stored in localStorage
+  const lastVisit = localStorage.getItem(visitorKey);
+  const today = new Date().toDateString(); // e.g. "Wed Nov 12 2025"
 
+  try {
+    let response;
+
+    if (lastVisit !== today) {
+      // First visit today → increment count
+      response = await fetch(incrementUrl);
+      localStorage.setItem(visitorKey, today);
+    } else {
+      // Already visited today → just get current count
+      response = await fetch(viewUrl);
+    }
+
+    if (!response.ok) throw new Error("Network response was not ok");
+
+    const data = await response.json();
+    document.getElementById("visitor-count").textContent = data.count;
+  } catch (error) {
+    console.error("Error fetching visitor count:", error);
+    document.getElementById("visitor-count").textContent = "N/A";
+  }
+}
+
+updateVisitorCount();
+</script>
+
+<script src="js/plugins.js"></script>
+<script src="js/main.js"></script>
 </body>
-
 </html>
