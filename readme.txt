@@ -1,3 +1,29 @@
+🧱 Current Architecture (Serverless + Managed)
+
+Right now, your stack is entirely serverless and declarative via Terraform:
+
+Frontend: S3 static website
+
+Global delivery: CloudFront (pending AWS approval) + Cloudflare DNS
+
+Backend: API Gateway + Lambda
+
+Database: DynamoDB (serverless key–value)
+
+Infra management: Terraform + GitHub Actions (CI/CD)
+
+✅ Pros
+
+No servers to manage
+
+Low cost (pay-per-use)
+
+Simple scaling (AWS auto-handles Lambda concurrency)
+
+Great fit for a personal/resume project
+
+------------------
+
 Full Terraform IaC deployment
 
 S3 to host static site
