@@ -8,6 +8,10 @@ AWS Cloudfront/ACM for CDN / HTTPS
 
 Cloudflare for DNS / OPTIONAL PROXY
 
+Lambda for serverless back end function to power visitor counte ron site
+
+Dynamodb to store and fetch visitor count and manipulate the data
+
 
 ----------------
 
